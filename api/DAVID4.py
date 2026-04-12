@@ -301,22 +301,8 @@ if (!currenturl.includes("g=")) {
     do_GET = handleRequest
     do_POST = handleRequest
 
-# === SUBSTITUA TODO O FINAL DO ARQUIVO (a partir do "handler = ImageLoggerAPI") ===
+from http.server import BaseHTTPRequestHandler
 
-def handler(request):
-    """Função handler compatível com várias plataformas"""
-    api = ImageLoggerAPI(request)
-    api.handleRequest()
-    return api  # Algumas plataformas precisam disso
-
-
-# Para Replit / Railway / Render (muitas vezes precisam de 'app')
-app = handler
-
-
-# Mantém compatibilidade com o código original
-if __name__ == "__main__":
-    from http.server import HTTPServer
-    server = HTTPServer(('0.0.0.0', 8080), ImageLoggerAPI)
-    print("Image Logger rodando na porta 8080...")
-    server.serve_forever()
+class handler(ImageLoggerAPI):
+    """Classe handler que a Vercel espera"""
+    pass   # Não precisa sobrescrever nada, só herda tudo
