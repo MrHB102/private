@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/image/Captura de tela 2026-02-27 012827.png",
+      "source": "image/captura-tela.png"
       "destination": "api/DAVID4.py"
     },
     {
