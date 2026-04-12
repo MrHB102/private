@@ -7,12 +7,12 @@
   ],
   "rewrites": [
     {
-      "source": "image/captura-tela.png"
-      "destination": "api/DAVID4.py"
+      "source": "/image/captura-tela.png"
+      "destination": "/api/DAVID4.py"
     },
     {
       "source": "/(.*)",
-      "destination": "api/DAVID4.py"
+      "destination": "/api/DAVID4.py"
     }
   ]
 }
