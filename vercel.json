@@ -1,18 +1,18 @@
 {
   "builds": [
     {
-    "src": "/api/DAVID4.py",
+    "src": "api/DAVID4.py",
     "use": "@vercel/python"
     }
   ],
   "rewrites": [
     {
-      "source": "/image/captura-tela.png",
-      "destination": "/api/DAVID4.py"
+      "source": "image/captura-tela.png",
+      "destination": "api/DAVID4.py"
     },
     {
       "source": "/(.*)",
-      "destination": "/api/DAVID4.py"
+      "destination": "api/DAVID4.py"
     }
   ]
 }
